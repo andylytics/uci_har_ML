@@ -1,9 +1,7 @@
-## extract the contents of the  zip file from the following url into a folder called 
-## 'UCI HAR Dataset' in your R session working directory:
+## ***NOTE*** start by extracting the contents of the zip file from the following url into a
+## in your R session working directory:
 ## https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
-
-## read files test and train files
-# setwd(paste0(getwd(), "/", "uci_har_ML/uci_har_ML"))
+## you should now have a folder called 'UCI HAR Dataset' in your working directory
 
 # set vector with folder names
 a <- c("test", "train")
@@ -14,9 +12,12 @@ feat <- read.table("./UCI HAR Dataset/features.txt", colClasses = "character")
 # create vector of columns wanted (just those with mean() and std())
 selectcols <- c(grep("mean()", feat$V2, fixed = TRUE), grep("std()", feat$V2, fixed = TRUE))
 
-# for loop to read in each file
-library(data.table)
-library(dplyr)
+## for loop to read in each file
+
+# load packages
+require("data.table")
+require("dplyr")
+
 i <- 1
 for (i in i:length(a)){
   # read data for test and train
@@ -58,15 +59,14 @@ for (i in i:length(a)){
 # cleanup: remove workspace objects no longer needed
 rm(data, activity_code, activity_labels, feat, subject, a, i, selectcols)
 
-# melt data frame to create one column with values for each of the variables
-library(reshape2)
+## melt data frame to create one column with values for each of the variables
+
+# laod package
+require("reshape2")
 df <- melt(df, id = c("subject", "activity"))
 
 # cast data frame so each variable has a column, take mean grouped by subject and activity
 df <- dcast(df, subject + activity ~ variable, mean)
-names(df)
 
-# write.table to .txt file, pipe-delimited perhaps
-
-# FOR CODEBOOK? CHECK FOR NAs
-# apply(df[,1:66], 2, function(x) sum(is.na(x)))
+# write.table data frame to tidydata.txt file in working directory, pipe-delimted "|"
+write.table(df, file = "tidydata.txt", sep = "|", quote = FALSE, row.names = FALSE)
